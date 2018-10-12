@@ -25,11 +25,9 @@
   :type 'boolean
   :group 'ospl)
 
-(defun ospl/buffer-body-width (&optional buffer pixelwise)
+(defun ospl/buffer-body-width (&optional buffer)
   "How many characters does the current window hold in X direction?"
-  (let ((width (window-width (get-buffer-window
-                              (or buffer (current-buffer)))
-                             pixelwise)))
+  (let ((width (window-total-width buffer)))
     (floor (cond
             ((eq text-scale-mode-amount 0)
              width)
@@ -43,10 +41,11 @@
   (let ((old-width right-margin-width))
     (setq right-margin-width
           (if ospl-mode
-              (max 0 (- (+ (ospl/buffer-body-width) right-margin-width) ospl-text-width))
+              (max 0 (- (ospl/buffer-body-width) ospl-text-width))
             0))
-    (if (not (eq old-width right-margin-width))
-        (set-window-buffer nil (current-buffer)))))
+    (when (not (eq old-width right-margin-width))
+      (message "Right-margin: %d" right-margin-width)
+      (set-window-buffer nil (current-buffer)))))
 
 
 (defun ospl/unfill-paragraph ()
@@ -104,7 +103,7 @@ This unfills the paragraph, and places hard line breaks after each sentence."
 
   (if ospl-mode
       (progn
-        (add-hook 'text-scale-mode-hook 'ospl/right-margin-update)
+        (add-hook 'text-scale-mode-hook #'ospl/right-margin-update)
         (add-hook 'window-size-change-functions  'ospl/right-margin-update)
         ;; Enable visual-line-mode
         (ospl/push-mode 'visual-line-mode)
@@ -117,7 +116,8 @@ This unfills the paragraph, and places hard line breaks after each sentence."
         (when ospl-adaptive-wrap-prefix
           (require 'adaptive-wrap)
           (ospl/push-mode 'adaptive-wrap-prefix-mode)
-          (adaptive-wrap-prefix-mode 1))
+          (adaptive-wrap-prefix-mode 1)
+          (setq adaptive-wrap-extra-indent 2))
         )
     (progn
       (remove-hook 'text-scale-mode-hook 'ospl/right-margin-update)
