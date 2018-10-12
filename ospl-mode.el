@@ -1,3 +1,15 @@
+;;; ospl-mode.el --- One Sentence Per Line Mode
+
+;; Copyright (C) 2018 Christian Dietrich
+;; Copyright (C) 2015 Scot Weldon
+;; Copyright (C) 2014 Franceso
+;; see https://emacs.stackexchange.com/questions/443/editing-files-with-one-sentence-per-line
+
+;; Author: Christian Dietrich <stettberger@dokucode.de>
+;; Keywords: line break, ospl
+;; Version: 1.0
+;;; Code:
+
 (defgroup ospl nil
   "One Sentence Per Line Mode."
   :prefix "ospl-"
