@@ -44,7 +44,6 @@
               (max 0 (- (ospl/buffer-body-width) ospl-text-width))
             0))
     (when (not (eq old-width right-margin-width))
-      (message "Right-margin: %d" right-margin-width)
       (set-window-buffer nil (current-buffer)))))
 
 
