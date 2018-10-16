@@ -71,6 +71,13 @@ This unfills the paragraph, and places hard line breaks after each sentence."
   "Get the state of an old mode."
   (if (alist-get mode ospl/old-modes) 1 -1))
 
+(defun ospl/update-margin ()
+  "Update the fill margins"
+  ;; This is an ugly hack, until visual-fill-column gets fixed
+  (visual-fill-column-mode -1)
+  (visual-fill-column-mode 1)
+  (set-window-buffer nil (current-window)))
+
 
 ;;;###autoload
 (define-minor-mode ospl-mode
@@ -83,6 +90,8 @@ This unfills the paragraph, and places hard line breaks after each sentence."
 
   (if ospl-mode
       (progn
+        (add-hook 'text-scale-mode-hook #'ospl/update-margin)
+        (add-hook 'window-size-change-functions  'ospl/update-margin)
         ;; Enable visual-line-mode
         (ospl/push-mode 'visual-line-mode)
         (visual-line-mode 1)
@@ -101,6 +110,8 @@ This unfills the paragraph, and places hard line breaks after each sentence."
           (setq adaptive-wrap-extra-indent 2))
         )
     (progn
+      (remove-hook 'text-scale-mode-hook #'ospl/update-margin)
+      (remove-hook 'window-size-change-functions  'ospl/update-margin)
       (visual-line-mode (ospl/pop-mode 'visual-line-mode))
       (visual-fill-column-mode (ospl/pop-mode 'visual-fill-column-mode))
       (auto-fill-mode (ospl/pop-mode 'auto-fill-mode))
