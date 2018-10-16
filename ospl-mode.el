@@ -4,11 +4,15 @@
 ;; Copyright (C) 2015 Scot Weldon
 ;; Copyright (C) 2014 Franceso
 
+;; Author: Christian Dietrich <stettberger@dokucode.de>
+;; URL: https://github.com/stettberger/ospl-mode.el
+;; Version: 1.0
+;; Keywords: line break, ospl
+;; Package-Requires: ((visual-fill-column "1.9"))
+
+;;; Commentary:
 ;; see https://emacs.stackexchange.com/questions/443/editing-files-with-one-sentence-per-line
 
-;; Author: Christian Dietrich <stettberger@dokucode.de>
-;; Keywords: line break, ospl
-;; Version: 1.0
 ;;; Code:
 
 (defgroup ospl nil
@@ -18,7 +22,7 @@
 
 
 (defcustom ospl-adaptive-wrap-prefix t
-  "Enable adaptive-wrap-prefix-mode with OSPL mode"
+  "Enable adaptive-wrap-prefix-mode with OSPL mode."
   :type 'boolean
   :group 'ospl)
 
@@ -64,7 +68,7 @@ This unfills the paragraph, and places hard line breaks after each sentence."
                             enabled))))
 
 (defun ospl/pop-mode (mode)
-  "get  the state of an old mode."
+  "Get the state of an old mode."
   (if (alist-get mode ospl/old-modes) 1 -1))
 
 
@@ -106,3 +110,5 @@ This unfills the paragraph, and places hard line breaks after each sentence."
       )))
 
 (provide 'ospl-mode)
+
+;;; ospl-mode.el ends here
