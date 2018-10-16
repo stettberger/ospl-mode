@@ -3,6 +3,7 @@
 ;; Copyright (C) 2018 Christian Dietrich
 ;; Copyright (C) 2015 Scot Weldon
 ;; Copyright (C) 2014 Franceso
+
 ;; see https://emacs.stackexchange.com/questions/443/editing-files-with-one-sentence-per-line
 
 ;; Author: Christian Dietrich <stettberger@dokucode.de>
@@ -15,37 +16,13 @@
   :prefix "ospl-"
   :group 'visual-line)
 
-(defcustom ospl-text-width 100
-  "Number of characters after that lines in One Sentence Per Line mode are broken softly."
-  :type 'integer
-  :group 'ospl)
 
 (defcustom ospl-adaptive-wrap-prefix t
   "Enable adaptive-wrap-prefix-mode with OSPL mode"
   :type 'boolean
   :group 'ospl)
 
-(defun ospl/buffer-body-width (&optional buffer)
-  "How many characters does the current window hold in X direction?"
-  (let ((width (window-total-width buffer)))
-    (floor (cond
-            ((eq text-scale-mode-amount 0)
-             width)
-            ((> text-scale-mode-amount 0)
-             (/ width (* text-scale-mode-step text-scale-mode-amount)))
-            ((< text-scale-mode-amount 0)
-             (* width (* -1 text-scale-mode-step text-scale-mode-amount)))))))
-
-(defun ospl/right-margin-update (&optional args )
-  "Set the right margin in OSPL mode to break the line at ospl-text-width"
-  (let ((old-width right-margin-width))
-    (setq right-margin-width
-          (if ospl-mode
-              (max 0 (- (ospl/buffer-body-width) ospl-text-width))
-            0))
-    (when (not (eq old-width right-margin-width))
-      (set-window-buffer nil (current-buffer)))))
-
+(require 'visual-fill-column)
 
 (defun ospl/unfill-paragraph ()
   "Unfill the paragraph at point.
@@ -102,12 +79,13 @@ This unfills the paragraph, and places hard line breaks after each sentence."
 
   (if ospl-mode
       (progn
-        (add-hook 'text-scale-mode-hook #'ospl/right-margin-update)
-        (add-hook 'window-size-change-functions  'ospl/right-margin-update)
         ;; Enable visual-line-mode
         (ospl/push-mode 'visual-line-mode)
         (visual-line-mode 1)
-        ;; Disable auto-fill-mode
+        ;; Enable Visual-Fill-Column-Mode
+        (ospl/push-mode 'visual-fill-column-mode)
+        (visual-fill-column-mode 1)
+        ;; Disable auto-fill-mode, as it really conflicts
         (ospl/push-mode 'auto-fill-mode
                         (not (eq auto-fill-function nil)))
         (auto-fill-mode -1)
@@ -119,14 +97,12 @@ This unfills the paragraph, and places hard line breaks after each sentence."
           (setq adaptive-wrap-extra-indent 2))
         )
     (progn
-      (remove-hook 'text-scale-mode-hook 'ospl/right-margin-update)
-      (remove-hook 'window-size-change-functions  'ospl/right-margin-update)
       (visual-line-mode (ospl/pop-mode 'visual-line-mode))
+      (visual-fill-column-mode (ospl/pop-mode 'visual-fill-column-mode))
       (auto-fill-mode (ospl/pop-mode 'auto-fill-mode))
       (if ospl-adaptive-wrap-prefix
           (adaptive-wrap-prefix-mode (ospl/pop-mode 'adpative-wrap-prefix-mode)))
       ;; (setq ospl/old-modes nil)
-      ))
-  (ospl/right-margin-update))
+      )))
 
 (provide 'ospl-mode)
