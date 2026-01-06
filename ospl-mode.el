@@ -71,12 +71,12 @@ This unfills the paragraph, and places hard line breaks after each sentence."
   "Get the state of an old mode."
   (if (alist-get mode ospl/old-modes) 1 -1))
 
-(defun ospl/update-margin ()
+(defun ospl/update-margin (&rest optional)
   "Update the fill margins"
   ;; This is an ugly hack, until visual-fill-column gets fixed
-  (visual-fill-column-mode -1)
-  (visual-fill-column-mode 1)
-  (set-window-buffer nil (current-window)))
+  (when ospl-mode
+      (visual-fill-column-mode -1)
+      (visual-fill-column-mode 1)))
 
 
 ;;;###autoload
